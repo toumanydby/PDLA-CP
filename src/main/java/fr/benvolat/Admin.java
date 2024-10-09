@@ -8,7 +8,7 @@ public class Admin extends User {
         super(userID, name, email, userBirthday);
     }
 
-    public void addBenevole (int BenevoleID) {
+    public void addBenevole(int BenevoleID) {
 
     }
 }

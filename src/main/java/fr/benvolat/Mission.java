@@ -6,28 +6,28 @@ public class Mission {
         PENDING, VALIDATE, REALISED, REFUSED
     }
 
-    private int id;
-    private String nom;
+    private int missionID;
+    private String name;
     private String description;
     private String status;
     private String motifRefus;
     private User requester;
     private Benevole volunteer;
 
-    public Mission(int id, String nom, String description, User requester) {
-        this.id = id;
-        this.nom = nom;
+    public Mission(int missionID, String name, String description, User requester) {
+        this.missionID = missionID;
+        this.name = name;
         this.description = description;
         this.status = STATUS.PENDING.toString();
         this.requester = requester;
     }
 
-    public int getId() {
-        return id;
+    public int getMissionID() {
+        return missionID;
     }
 
-    public String getNom() {
-        return nom;
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {
@@ -54,4 +54,3 @@ public class Mission {
         }
     }
 }
-
