@@ -39,4 +39,6 @@ public class DBConnection {
         //System.out.println(url);
         return DriverManager.getConnection(url,user,password);
     }
+
+
 }

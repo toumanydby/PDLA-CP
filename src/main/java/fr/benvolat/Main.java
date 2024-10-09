@@ -11,7 +11,6 @@ public class Main {
         try{
             dbCon = DBConnection.getConnection();
             statement = dbCon.createStatement();
-            System.out.println("iciiiii");
             String query = "CREATE TABLE users( id VARCHAR(255) PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, role VARCHAR(255) NOT NULL)";
             dbCon.prepareStatement(query).execute();
             System.out.println("Hello world! table user created");
