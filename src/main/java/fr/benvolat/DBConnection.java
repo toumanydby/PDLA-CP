@@ -8,11 +8,12 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBConnection {
-    private static final String url;
-    private static final String user;
-    private static final String password;
+    private static final String url = "jdbc:mysql://srv-bdens.insa-toulouse.fr:3306/projet_gei_015";
+    private static final String user = "projet_gei_015";
+    private static final String password = "oFie9oov";
     // mysql -h srv-bdens.insa-toulouse.fr --port=3306 -u projet_gei_015 -p projet_gei_015
 
+/**
     // Recuperation des informations de connection dans le fichier db.properties
     static {
         try {
@@ -27,7 +28,7 @@ public class DBConnection {
             throw new RuntimeException(e);
         }
     }
-
+*/
 
     /**
      * Methode permettant de se connecter a la bdd
@@ -35,6 +36,7 @@ public class DBConnection {
      * @throws SQLException
      */
     public static Connection getConnection() throws SQLException {
+        //System.out.println(url);
         return DriverManager.getConnection(url,user,password);
     }
 }
