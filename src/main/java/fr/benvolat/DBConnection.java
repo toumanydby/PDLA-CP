@@ -8,11 +8,12 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBConnection {
-    private static String url;
-    private static String user;
-    private static String password;
+    private static final String url;
+    private static final String user;
+    private static final String password;
+    // mysql -h srv-bdens.insa-toulouse.fr --port=3306 -u projet_gei_015 -p projet_gei_015
 
-
+    // Recuperation des informations de connection dans le fichier db.properties
     static {
         try {
             InputStream ip = DBConnection.class.getClassLoader().getResourceAsStream("db.properties");
@@ -26,6 +27,13 @@ public class DBConnection {
             throw new RuntimeException(e);
         }
     }
+
+
+    /**
+     * Methode permettant de se connecter a la bdd
+     * @return Connection entity, that will give us the possibility to modify our DB
+     * @throws SQLException
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url,user,password);
     }
