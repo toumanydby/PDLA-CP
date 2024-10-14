@@ -34,7 +34,7 @@ public class SignInUI extends JFrame {
         return panel;
     }
 
-    public SignInUI() throws SQLException {
+   public SignInUI() throws SQLException {
         userService = new UserService();
         setTitle("Sign In");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,20 +43,29 @@ public class SignInUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        signInButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    String email = emailTextField.getText();
-                    String password = Arrays.toString(passwordTextField.getPassword());
-                    if (password != Arrays.toString(confirmPasswordTextField.getPassword())) {
+        signInButton.addActionListener(actionEvent -> {
+            String email = emailTextField.getText();
+            String password = passwordTextField.getText();
+            System.out.println(email);
+            System.out.println(password);
+            System.out.println(confirmPasswordTextField.getText());
 
-                    }
-                    // userService.authenticateUser(, )
-                } catch (Exception e) {
-
-                }
+            if (!password.equals(confirmPasswordTextField.getText())) {
+                System.out.println("Password not matching");
+                System.exit(1);
             }
+            User userAuthenticated = userService.authenticateUser(email, password);
+            if (userAuthenticated == null) {
+                JDialog diag = MainInterface.createDialogModal(new JFrame(), "Utilisateur inconnu", "Ce utilisateur n'est pas connu de notre application");
+            } else {
+                JDialog diag = MainInterface.createDialogModal(new JFrame(), "Utilisateur connecte", "L'utilisateur du nom de " + userAuthenticated.getName() + " est connecte");
+            }
+        });
+
+        resetButtuon.addActionListener(actionEvent -> {
+            emailTextField.setText("");
+            passwordTextField.setText("");
+            confirmPasswordTextField.setText("");
         });
     }
 
