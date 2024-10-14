@@ -52,8 +52,9 @@ public class UserDataAccess {
     public User findUserByEmail(String email) {
         String query = "SELECT * FROM Users WHERE email = ?";
         User user = null;
-        try(PreparedStatement st = connection.prepareStatement(query);
-            ResultSet rs = st.executeQuery()){
+        try(PreparedStatement st = connection.prepareStatement(query);){
+            st.setString(1,email);
+            ResultSet rs = st.executeQuery();
             while (rs.next()){
                 user = getUser(rs);
             }

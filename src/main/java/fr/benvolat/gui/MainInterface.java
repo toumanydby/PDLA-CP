@@ -71,6 +71,31 @@ public class MainInterface extends JFrame {
         setVisible(true);
     }
 
+    public static JDialog createDialogModal(final JFrame frame, String title, String contenu) {
+        JDialog dialog = new JDialog(frame, title, true);
+        dialog.setBounds(500,500,600,500);
+        Container dialogContentPane = dialog.getContentPane();
+        dialogContentPane.setLayout(new BorderLayout());
+        JLabel txtBut = new JLabel(
+                contenu,
+                JLabel.CENTER
+        );
+        txtBut.setFont(new Font("Serif", Font.PLAIN, 25));
+        txtBut.setForeground(new Color(0x111010));
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout());
+        JButton okButton = new JButton("CLOSE");
+        okButton.addActionListener(actionEvent -> dialog.setVisible(false));
+        panel.add(okButton);
+
+        dialogContentPane.add(txtBut, BorderLayout.CENTER);
+        dialogContentPane.add(panel, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+
+        return dialog;
+    }
+
     public static void main(String[] args) {
         // Run the GUI in the Event Dispatch Thread
         SwingUtilities.invokeLater(MainInterface::new);
