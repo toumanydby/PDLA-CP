@@ -46,14 +46,14 @@ public class SignInUI extends JFrame {
         signInButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                try{
+                try {
                     String email = emailTextField.getText();
                     String password = Arrays.toString(passwordTextField.getPassword());
-                    if(password != Arrays.toString(confirmPasswordTextField.getPassword())){
+                    if (password != Arrays.toString(confirmPasswordTextField.getPassword())) {
 
                     }
-                   // userService.authenticateUser(, )
-                } catch (Exception e){
+                    // userService.authenticateUser(, )
+                } catch (Exception e) {
 
                 }
             }
