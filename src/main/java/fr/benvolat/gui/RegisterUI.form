@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="fr.benvolat.gui.RegisterUI">
+  <grid id="27dc6" binding="panel" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="10" left="10" bottom="10" right="10"/>
+    <constraints>
+      <xy x="20" y="27" width="544" height="374"/>
+    </constraints>
+    <properties>
+      <enabled value="true"/>
+      <preferredSize width="500" height="400"/>
+    </properties>
+    <clientProperties>
+      <html.disable class="java.lang.Boolean" value="false"/>
+    </clientProperties>
+    <border type="line" title="Sing up">
+      <font name="JetBrains Mono" size="18" style="1"/>
+      <color color="-2104859"/>
+    </border>
+    <children>
+      <component id="8366e" class="javax.swing.JTextField" binding="nameTextField">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="74183" class="javax.swing.JTextField" binding="emailTextField">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="c5ab9" class="javax.swing.JPasswordField" binding="passwordTextField">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="312d0" class="javax.swing.JPasswordField" binding="confirmPasswordTextField">
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="dcf41" class="javax.swing.JLabel" binding="nomLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="76" height="17"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Nom"/>
+        </properties>
+      </component>
+      <component id="96700" class="javax.swing.JLabel" binding="emailLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="76" height="17"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Email"/>
+        </properties>
+      </component>
+      <component id="631c" class="javax.swing.JLabel" binding="passwordLabel">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="76" height="17"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Password"/>
+        </properties>
+      </component>
+      <component id="188f4" class="javax.swing.JLabel" binding="confPasswordLabel">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="76" height="17"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Confirm password"/>
+        </properties>
+      </component>
+      <component id="96441" class="javax.swing.JLabel" binding="roleLabel">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="76" height="17"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Role"/>
+          <toolTipText value="Utilisé pour savoir si on est benevole ou demandeur"/>
+        </properties>
+      </component>
+      <component id="1fb64" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="BENEVOLE"/>
+            <item value="DEMANDEUR"/>
+          </model>
+        </properties>
+      </component>
+      <component id="25d10" class="javax.swing.JButton" binding="resetButtuon">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Reset"/>
+        </properties>
+      </component>
+      <component id="d88a1" class="javax.swing.JButton" binding="signUpButton" default-binding="true">
+        <constraints>
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Sign up"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
