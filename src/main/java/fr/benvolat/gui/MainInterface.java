@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class MainInterface extends JFrame {
 
@@ -43,8 +44,8 @@ public class MainInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Open the registration form
-                setContentPane(new RegisterUI().getPanel());
-                //RegisterUI registerForm = new RegisterUI();
+                //setContentPane(new RegisterUI().getPanel());
+                RegisterUI registerForm = new RegisterUI();
 
                 //dispose();  // Close current window
             }
@@ -56,8 +57,12 @@ public class MainInterface extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Open the sign-in form
 
-                setContentPane(new SignInUI().getPanel());
-                //SignInUI singInForm = new SignInUI();
+                //setContentPane(new SignInUI().getPanel());
+                try {
+                    SignInUI singInForm = new SignInUI();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
                 //dispose();  // Close current window
             }
         });

@@ -1,10 +1,16 @@
 package fr.benvolat.gui;
 
+import fr.benvolat.service.UserService;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class SignInUI extends JFrame {
@@ -18,6 +24,8 @@ public class SignInUI extends JFrame {
     private JButton resetButtuon;
     private JButton signInButton;
 
+    private UserService userService;
+
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
@@ -26,13 +34,30 @@ public class SignInUI extends JFrame {
         return panel;
     }
 
-    public SignInUI() {
+    public SignInUI() throws SQLException {
+        userService = new UserService();
         setTitle("Sign In");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setContentPane(panel);
+        setContentPane(panel);
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+
+        signInButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try{
+                    String email = emailTextField.getText();
+                    String password = Arrays.toString(passwordTextField.getPassword());
+                    if(password != Arrays.toString(confirmPasswordTextField.getPassword())){
+
+                    }
+                   // userService.authenticateUser(, )
+                } catch (Exception e){
+
+                }
+            }
+        });
     }
 
 

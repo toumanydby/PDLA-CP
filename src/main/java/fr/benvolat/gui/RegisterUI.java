@@ -5,6 +5,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Locale;
 
 public class RegisterUI extends JFrame {
@@ -29,10 +31,21 @@ public class RegisterUI extends JFrame {
     public RegisterUI() {
         setTitle("Register to volunteer application");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setContentPane(panel);
+        setContentPane(panel);
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+
+        /*signUpButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Open the registration form
+                setContentPane(new RegisterUI().getPanel());
+                //RegisterUI registerForm = new RegisterUI();
+
+                //dispose();  // Close current window
+            }
+        });*/
     }
 
 
