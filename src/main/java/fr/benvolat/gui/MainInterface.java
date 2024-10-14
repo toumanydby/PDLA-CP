@@ -60,6 +60,7 @@ public class MainInterface extends JFrame {
                 //setContentPane(new SignInUI().getPanel());
                 try {
                     SignInUI singInForm = new SignInUI();
+                    //dispose();  // Close current window
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -73,14 +74,14 @@ public class MainInterface extends JFrame {
 
     public static JDialog createDialogModal(final JFrame frame, String title, String contenu) {
         JDialog dialog = new JDialog(frame, title, true);
-        dialog.setBounds(500,500,600,500);
+        dialog.setBounds(50,50,60,60);
         Container dialogContentPane = dialog.getContentPane();
         dialogContentPane.setLayout(new BorderLayout());
         JLabel txtBut = new JLabel(
                 contenu,
                 JLabel.CENTER
         );
-        txtBut.setFont(new Font("Serif", Font.PLAIN, 25));
+        txtBut.setFont(new Font("Serif", Font.PLAIN, 10));
         txtBut.setForeground(new Color(0x111010));
 
         JPanel panel = new JPanel();

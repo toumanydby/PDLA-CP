@@ -30,7 +30,7 @@ public class RegisterUI extends JFrame {
 
     public RegisterUI() {
         setTitle("Register to volunteer application");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setContentPane(panel);
         pack();
         setLocationRelativeTo(null);

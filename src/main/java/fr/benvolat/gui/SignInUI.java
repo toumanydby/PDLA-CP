@@ -8,10 +8,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class SignInUI extends JFrame {
@@ -25,20 +22,16 @@ public class SignInUI extends JFrame {
     private JButton resetButtuon;
     private JButton signInButton;
 
-    private UserService userService;
+    private final UserService userService;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
 
-    public JPanel getPanel() {
-        return panel;
-    }
-
     public SignInUI() throws SQLException {
         userService = new UserService();
         setTitle("Sign In");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setContentPane(panel);
         pack();
         setLocationRelativeTo(null);
@@ -52,14 +45,33 @@ public class SignInUI extends JFrame {
             System.out.println(confirmPasswordTextField.getText());
 
             if (!password.equals(confirmPasswordTextField.getText())) {
-                System.out.println("Password not matching");
-                System.exit(1);
+                MainInterface.createDialogModal(new JFrame(), "Utilisateur inconnu", "Ce utilisateur n'est pas connu de notre application");
+                dispose();
             }
+
             User userAuthenticated = userService.authenticateUser(email, password);
-            if (userAuthenticated == null) {
-                JDialog diag = MainInterface.createDialogModal(new JFrame(), "Utilisateur inconnu", "Ce utilisateur n'est pas connu de notre application");
-            } else {
-                JDialog diag = MainInterface.createDialogModal(new JFrame(), "Utilisateur connecte", "L'utilisateur du nom de " + userAuthenticated.getName() + " est connecte");
+            JFrame frameToPrint;
+            try {
+                switch (userAuthenticated.getUserRole()) {
+                    case "ADMIN" -> {
+                        //frameToPrint = new AdminGUI(userAuthenticated);
+                        dispose();
+                    }
+                    case "USER" -> {
+                        frameToPrint = new UserGUI(userAuthenticated);
+                        dispose();
+                    }
+                    case "MODERATOR" -> {
+                        //frameToPrint = new ModeratorGUI(userAuthenticated);
+                        dispose();
+                    }
+                    case "BENEVOLE" -> {
+                        //frameToPrint = new VolunterGUI(userAuthenticated);
+                        dispose();
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         });
 
