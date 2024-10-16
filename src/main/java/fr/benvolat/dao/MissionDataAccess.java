@@ -102,6 +102,23 @@ public class MissionDataAccess {
         return mission;
     }
 
+    public ArrayList<Mission> findAllMissionsForOneVolunteer(int volunteer_id) {
+        ArrayList<Mission> missionsList = new ArrayList<>();
+        String query = "SELECT * FROM Missions_requests WHERE volunteer_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1,volunteer_id);
+            ResultSet rs = stmt.executeQuery();
+            Mission mission = null;
+            while (rs.next()) {
+                mission = getMissions(rs);
+                missionsList.add(mission);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return missionsList;
+    }
+
     /**
      *  Fonction permettant de trouver toutes les missions
      * @return Une ArrayList contenant les differentes missions de l'appli

@@ -13,7 +13,7 @@ public class MissionService {
 
     private final MissionDataAccess missionDAO;
 
-    public MissionService(MissionDataAccess missionDAO) throws SQLException {
+    public MissionService() throws SQLException {
         this.missionDAO = new MissionDataAccess();
     }
 
@@ -41,6 +41,10 @@ public class MissionService {
     // Method to get all pending help requests
     public ArrayList<Mission> getPendingMissionsRequests() {
         return missionDAO.findMissionsRequestsByStatus("Pending");
+    }
+
+    public ArrayList<Mission> getAllMissionsForOneVolunteer(int volunteer_id) {
+        return missionDAO.findAllMissionsForOneVolunteer(volunteer_id);
     }
 
     public boolean moderateMission(int missionId, Mission.STATUS status){
