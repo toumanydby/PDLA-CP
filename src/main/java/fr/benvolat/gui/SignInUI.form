@@ -13,7 +13,7 @@
       <font size="20" style="1"/>
     </border>
     <children>
-      <component id="32c18" class="javax.swing.JTextField" binding="emailTextField">
+      <component id="32c18" class="javax.swing.JTextField" binding="userNameTextField">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -37,14 +37,14 @@
         </constraints>
         <properties/>
       </component>
-      <component id="b49a3" class="javax.swing.JLabel" binding="emailLabel">
+      <component id="b49a3" class="javax.swing.JLabel" binding="userNameLabel">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="76" height="17"/>
           </grid>
         </constraints>
         <properties>
-          <text value="Email"/>
+          <text value="Username"/>
         </properties>
       </component>
       <component id="a9aa0" class="javax.swing.JLabel" binding="passwordLabel">
@@ -90,6 +90,14 @@
         <properties>
           <text value="Label"/>
           <visible value="false"/>
+        </properties>
+      </component>
+      <component id="d3729" class="javax.swing.JButton" binding="backButton" default-binding="true">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Back"/>
         </properties>
       </component>
     </children>

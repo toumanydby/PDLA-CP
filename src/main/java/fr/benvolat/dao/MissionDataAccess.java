@@ -113,7 +113,59 @@ public class MissionDataAccess {
         try (PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()
         ) {
-            Mission mission = null;
+            Mission mission;
+            while (rs.next()) {
+                mission = getMissions(rs);
+                missionsList.add(mission);
+            }
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return missionsList;
+    }
+
+
+    public ArrayList<Mission> getMissionsByUserId(int userId) {
+        ArrayList<Mission> missionsList = new ArrayList<>();
+        String query = "SELECT * FROM Missions_requests WHERE requester_id = ?";
+
+        return getMissions(userId, missionsList, query);
+    }
+
+    public ArrayList<Mission> getMissionsByVolunteerId(int volunteerId) {
+        ArrayList<Mission> missionsList = new ArrayList<>();
+        String query = "SELECT * FROM Missions_requests WHERE volunteer_id = ?";
+
+        return getMissions(volunteerId, missionsList, query);
+    }
+
+    public ArrayList<Mission> getMissionsByVolunteerIdAndStatus(int volunteerId, String status) {
+        ArrayList<Mission> missionsList = new ArrayList<>();
+        String query = "SELECT * FROM Missions_requests WHERE volunteer_id = ? AND status = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)
+        ) {
+            stmt.setInt(1,volunteerId);
+            stmt.setString(2,status);
+            ResultSet rs = stmt.executeQuery();
+            Mission mission;
+            while (rs.next()) {
+                mission = getMissions(rs);
+                missionsList.add(mission);
+            }
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return missionsList;
+    }
+
+    private ArrayList<Mission> getMissions(int userId, ArrayList<Mission> missionsList, String query) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)
+        ) {
+            stmt.setInt(1,userId);
+            ResultSet rs = stmt.executeQuery();
+            Mission mission;
             while (rs.next()) {
                 mission = getMissions(rs);
                 missionsList.add(mission);

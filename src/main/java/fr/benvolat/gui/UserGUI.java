@@ -1,12 +1,17 @@
 package fr.benvolat.gui;
 
 import fr.benvolat.models.User;
+import fr.benvolat.service.MissionService;
 import fr.benvolat.service.UserService;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class UserGUI extends JFrame {
     private JPanel panel;
@@ -15,20 +20,101 @@ public class UserGUI extends JFrame {
     private JTextArea missionDescriptionTextArea;
     private JButton resetButton;
     private JButton demanderButton;
+    private JButton seDeconnecterButton;
+    private JTable missionsTable;
+    private JLabel missionsTableLabel;
+    private JButton voirDemandesButton;
     private final UserService userService;
+    private final MissionService missionService;
     private User userConnected;
+    private MainInterface mainInterface;
 
-    public UserGUI(User user) throws SQLException {
+
+    public UserGUI(MainInterface mainInterface, User user) throws SQLException {
+        this.mainInterface = mainInterface;
         this.userConnected = user;
         userService = new UserService();
-        setTitle("User Main page");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setContentPane(panel);
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+        missionService = new MissionService();
+        seDeconnecterButton.addActionListener(e -> {
+            mainInterface.reset();
+            mainInterface.showPanel("MainMenu", null);
+        });
+
+        resetButton.addActionListener(e -> {
+            missionNameTextField.setText("");
+            missionDescriptionTextArea.setText("");
+        });
+
+        demanderButton.addActionListener(e -> {
+            String missionName = missionNameTextField.getText();
+            String missionDescription = missionDescriptionTextArea.getText();
+            if (missionName.isEmpty() || missionDescription.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "Veuillez s'il vous plait remplir tous les champs pour pouvoir confirmer votre demande");
+            } else {
+                boolean isSubmitted = missionService.submitMissionRequest(missionName, userConnected.getUserID(), missionDescription);
+                if (isSubmitted) {
+                    JOptionPane.showMessageDialog(panel, "Votre demande d'aide a bien ete enregistre, nos moderateurs vous informerons de la confirmation de votre demande ");
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Votre demande d'aide n'a pas pu etre enregistre, vueillez s'il vous plait reassayer !!");
+                }
+            }
+        });
+
+        voirDemandesButton.addActionListener(e -> {
+            // Create a DefaultTableModel and set it as the model for the table
+            DefaultTableModel tableModel = new DefaultTableModel() {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    // All cells are non-editable
+                    return false;
+                }
+
+            };
+
+            // Define column names
+            tableModel.setColumnIdentifiers(MainInterface.columnNames);
+            tableModel.addRow(MainInterface.columnNames);
+            String[][] missionsData = missionService.getUserMissionsData(userConnected.getUserID());
+            for (String[] missionsDatum : missionsData) {
+                tableModel.addRow(missionsDatum);
+            }
+
+            // Set the table model to the JTable
+            missionsTable.setModel(tableModel);
+
+            // Hide the "ID" column (index 0)
+            missionsTable.removeColumn(missionsTable.getColumnModel().getColumn(0));  // This will hide the first column (ID)
+
+            // Disable cell selection
+            missionsTable.setCellSelectionEnabled(false);
+            // Disable row selection by overriding the ListSelectionModel
+            missionsTable.setRowSelectionAllowed(false);
+            missionsTable.setColumnSelectionAllowed(false);
+            missionsTableLabel.setVisible(true);
+        });
     }
 
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    public void setUserConnected(User userConnected) {
+        this.userConnected = userConnected;
+    }
+
+    public void resetUserGUI() {
+        missionNameTextField.setText("");
+        missionDescriptionTextArea.setText("");
+        missionsTableLabel.setVisible(false);
+    }
+
+
+    public ArrayList<JTextComponent> getTextComponents() {
+        ArrayList<JTextComponent> textComponents = new ArrayList<>();
+        textComponents.add(missionNameTextField);
+        textComponents.add(missionDescriptionTextArea);
+        return textComponents;
+    }
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -46,29 +132,41 @@ public class UserGUI extends JFrame {
      */
     private void $$$setupUI$$$() {
         panel = new JPanel();
-        panel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 3, new Insets(10, 10, 10, 10), -1, -1));
+        panel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(7, 4, new Insets(10, 10, 10, 10), -1, -1));
         panel.setBorder(BorderFactory.createTitledBorder(null, "Volunteer App", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-        panel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         topLabel = new JLabel();
         topLabel.setText("Creer une demande d'aide");
-        panel.add(topLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel.add(topLabel, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 3, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         missionNameTextField = new JTextField();
-        panel.add(missionNameTextField, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        panel.add(missionNameTextField, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 3, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         missionDescriptionTextArea = new JTextArea();
-        panel.add(missionDescriptionTextArea, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        missionDescriptionTextArea.setWrapStyleWord(true);
+        panel.add(missionDescriptionTextArea, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 3, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         final JLabel label1 = new JLabel();
         label1.setText("Nom de l'aide");
-        panel.add(label1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel.add(label1, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
         label2.setText("Description");
-        panel.add(label2, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel.add(label2, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         resetButton = new JButton();
         resetButton.setText("Reset");
-        panel.add(resetButton, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel.add(resetButton, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         demanderButton = new JButton();
         demanderButton.setText("Demander");
-        panel.add(demanderButton, new com.intellij.uiDesigner.core.GridConstraints(3, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel.add(demanderButton, new com.intellij.uiDesigner.core.GridConstraints(4, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        seDeconnecterButton = new JButton();
+        seDeconnecterButton.setText("Se déconnecter");
+        panel.add(seDeconnecterButton, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        missionsTable = new JTable();
+        panel.add(missionsTable, new com.intellij.uiDesigner.core.GridConstraints(6, 0, 1, 4, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        missionsTableLabel = new JLabel();
+        missionsTableLabel.setText("Mes demandes d'aide");
+        missionsTableLabel.setVisible(false);
+        panel.add(missionsTableLabel, new com.intellij.uiDesigner.core.GridConstraints(5, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        voirDemandesButton = new JButton();
+        voirDemandesButton.setLabel("Voir demandes");
+        voirDemandesButton.setText("Voir demandes");
+        panel.add(voirDemandesButton, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         label1.setLabelFor(missionNameTextField);
         label2.setLabelFor(missionDescriptionTextArea);
     }
@@ -79,5 +177,6 @@ public class UserGUI extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return panel;
     }
+
 
 }

@@ -6,82 +6,88 @@ import fr.benvolat.service.UserService;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class SignInUI extends JFrame {
     private JPanel panel;
-    private JTextField emailTextField;
+    private JTextField userNameTextField;
     private JPasswordField passwordTextField;
     private JPasswordField confirmPasswordTextField;
-    private JLabel emailLabel;
+    private JLabel userNameLabel;
     private JLabel passwordLabel;
     private JLabel confPasswordLabel;
     private JButton resetButtuon;
     private JButton signInButton;
+    private JButton backButton;
 
     private final UserService userService;
+
+    private MainInterface mainInterface;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
 
-    public SignInUI() throws SQLException {
+    public SignInUI(MainInterface mainInterface) throws SQLException {
+        this.mainInterface = mainInterface;
         userService = new UserService();
-        setTitle("Sign In");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setContentPane(panel);
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+
+        backButton.addActionListener(e -> {
+            mainInterface.reset();
+            mainInterface.showPanel("MainMenu", null);
+        });
 
         signInButton.addActionListener(actionEvent -> {
-            String email = emailTextField.getText();
+            String userName = userNameTextField.getText();
             String password = passwordTextField.getText();
-            System.out.println(email);
-            System.out.println(password);
-            System.out.println(confirmPasswordTextField.getText());
 
             if (!password.equals(confirmPasswordTextField.getText())) {
-                MainInterface.createDialogModal(new JFrame(), "Utilisateur inconnu", "Ce utilisateur n'est pas connu de notre application");
-                dispose();
-            }
+                JOptionPane.showMessageDialog(panel, "Les mots de passe entres ne sont pas valides ", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                User userAuthenticated = userService.authenticateUser(userName, password);
 
-            User userAuthenticated = userService.authenticateUser(email, password);
-            JFrame frameToPrint;
-            try {
-                switch (userAuthenticated.getUserRole()) {
-                    case "ADMIN" -> {
-                        //frameToPrint = new AdminGUI(userAuthenticated);
-                        dispose();
+                if (userAuthenticated != null) {
+                    switch (userAuthenticated.getUserRole()) {
+                        case "ADMIN" -> mainInterface.showPanel("Admin", userAuthenticated);
+                        case "USER" -> mainInterface.showPanel("User", userAuthenticated);
+                        case "MODERATOR" -> mainInterface.showPanel("Moderator", userAuthenticated);
+                        case "BENEVOLE" -> mainInterface.showPanel("Benevole", userAuthenticated);
                     }
-                    case "USER" -> {
-                        frameToPrint = new UserGUI(userAuthenticated);
-                        dispose();
-                    }
-                    case "MODERATOR" -> {
-                        //frameToPrint = new ModeratorGUI(userAuthenticated);
-                        dispose();
-                    }
-                    case "BENEVOLE" -> {
-                        //frameToPrint = new VolunterGUI(userAuthenticated);
-                        dispose();
-                    }
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Erreur de connexion", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
         });
 
         resetButtuon.addActionListener(actionEvent -> {
-            emailTextField.setText("");
+            userNameTextField.setText("");
             passwordTextField.setText("");
             confirmPasswordTextField.setText("");
         });
     }
 
+    public void resetSignInGUI() {
+        userNameTextField.setText("");
+        passwordTextField.setText("");
+        confirmPasswordTextField.setText("");
+    }
+
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    public ArrayList<JTextComponent> getTextComponents() {
+        ArrayList<JTextComponent> textComponents = new ArrayList<>();
+        textComponents.add(userNameTextField);
+        textComponents.add(passwordTextField);
+        textComponents.add(confirmPasswordTextField);
+        return textComponents;
+    }
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -103,15 +109,15 @@ public class SignInUI extends JFrame {
         panel.setVerifyInputWhenFocusTarget(true);
         panel.setVisible(true);
         panel.setBorder(BorderFactory.createTitledBorder(null, "Sign In", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, this.$$$getFont$$$(null, Font.BOLD, 20, panel.getFont()), null));
-        emailTextField = new JTextField();
-        panel.add(emailTextField, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        userNameTextField = new JTextField();
+        panel.add(userNameTextField, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         passwordTextField = new JPasswordField();
         panel.add(passwordTextField, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         confirmPasswordTextField = new JPasswordField();
         panel.add(confirmPasswordTextField, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 2, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        emailLabel = new JLabel();
-        emailLabel.setText("Email");
-        panel.add(emailLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(76, 17), null, 0, false));
+        userNameLabel = new JLabel();
+        userNameLabel.setText("Username");
+        panel.add(userNameLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(76, 17), null, 0, false));
         passwordLabel = new JLabel();
         passwordLabel.setText("Password");
         panel.add(passwordLabel, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(76, 17), null, 0, false));
@@ -128,6 +134,9 @@ public class SignInUI extends JFrame {
         label1.setText("Label");
         label1.setVisible(false);
         panel.add(label1, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        backButton = new JButton();
+        backButton.setText("Back");
+        panel.add(backButton, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -158,5 +167,6 @@ public class SignInUI extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return panel;
     }
+
 
 }
