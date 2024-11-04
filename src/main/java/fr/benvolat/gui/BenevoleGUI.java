@@ -7,24 +7,40 @@ import fr.benvolat.service.UserService;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class BenevoleGUI extends JFrame {
     private JButton seDeconnecterButton;
     private JButton voirMissionsButton;
-    private JButton voirMissionsRealiseesButton;
+   // private JButton voirMissionsRealiseesButton;
     private JTable missionsTable;
     private JButton voirMissionsEnCoursButton;
     private JLabel missionTableLabel;
     private JPanel panel;
+    private JButton donnerMonAvisButton;
+    private JTextArea reviewTextArea;
+    private JButton soumettreButton;
+    private JScrollBar scrollBar1;
     private static MissionService missionService;
     private static UserService userService;
     private static User userConnected;
     private MainInterface mainInterface;
+
+
+    public JPanel getPanel() {
+        return this.panel;
+    }
+
+    public void setUserConnected(User user) {
+        userConnected = user;
+    }
 
     public BenevoleGUI(MainInterface mainInterface, User user) throws SQLException {
         this.mainInterface = mainInterface;
@@ -32,14 +48,74 @@ public class BenevoleGUI extends JFrame {
         userService = new UserService();
         missionService = new MissionService();
 
+        MouseAdapter mouseAdapterTab1 = getMouseAdapter(missionsTable, 1);
+        MouseAdapter mouseAdapterTab2 = getMouseAdapter(missionsTable, 0);
+
+        missionsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    Color back = table.isRowSelected(row) ? Color.GREEN : table.getBackground();
+                    setBackground(back);
+                } else {
+                    setBackground(table.getBackground());
+                }
+                return this;
+            }
+        });
+
+        // Disable row selection by overriding the ListSelectionModel
+        missionsTable.setSelectionModel(new DefaultListSelectionModel() {
+            @Override
+            public void setSelectionInterval(int index0, int index1) {
+                // Prevent selection of the first row (index 0)
+                if (index0 == 0 || index1 == 0) {
+                    // Do nothing if the first row is selected
+                    return;
+                }
+                super.setSelectionInterval(index0, index1);
+            }
+        });
 
         seDeconnecterButton.addActionListener(e -> {
             mainInterface.reset();
             mainInterface.showPanel("MainMenu", null);
         });
 
+        donnerMonAvisButton.addActionListener(e -> {
+            reviewTextArea.setVisible(true);
+            soumettreButton.setVisible(true);
+        });
+
+        scrollBar1.addAdjustmentListener(e -> {
+            // Move the panel up/dow
+            mainInterface.getMainPanel().setLocation(0, -e.getValue());
+        });
+
+        soumettreButton.addActionListener(e -> {
+            String review = reviewTextArea.getText();
+            if (review.isEmpty()) {
+                JOptionPane.showMessageDialog(mainInterface, "You hava to write a review", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                boolean isSent = userService.sendRewiew(userConnected.getUserID(), review);
+                if (isSent) {
+                    JOptionPane.showMessageDialog(mainInterface, "Your review was successfully sent", "Sent review", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(mainInterface, "Your review was not sent", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            reviewTextArea.setText("");
+            reviewTextArea.setVisible(false);
+            soumettreButton.setVisible(false);
+        });
+
         voirMissionsButton.addActionListener(e -> {
-            DefaultTableModel tableModel = new DefaultTableModel() {
+            missionsTable.removeMouseListener(mouseAdapterTab2);
+            missionsTable.addMouseListener(mouseAdapterTab1);
+
+
+            DefaultTableModel tableModel = new DefaultTableModel(MainInterface.columnNames, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return false;
@@ -55,45 +131,22 @@ public class BenevoleGUI extends JFrame {
 
             // Set the table model to the JTable
             missionsTable.setModel(tableModel);
-            // Disable cell selection
+            // Disable cell and row selection
             missionsTable.setCellSelectionEnabled(false);
-
-            // Disable row selection by overriding the ListSelectionModel
             missionsTable.setRowSelectionAllowed(false);
-            missionsTable.setColumnSelectionAllowed(false);
             missionsTable.removeColumn(missionsTable.getColumnModel().getColumn(0));  // This will hide the first column (ID)
             missionTableLabel.setText("Missions");
             missionTableLabel.setVisible(true);
             missionTableLabel.setVisible(true);
-            // Add mouse listener to detect double-click on rows
-            missionsTable.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    // Check if the event is a double-click
-                    if (e.getClickCount() == 2 && !e.isConsumed()) {
-                        e.consume();  // Prevent further processing if needed
-
-                        // Get the index of the clicked row
-                        int row = missionsTable.getSelectedRow();
-
-                        // If the row is valid (not -1), do something
-                        if (row != -1) {
-                            // Example action: print row data
-                            Object missionId = missionsTable.getModel().getValueAt(row, 0);  // Get ID from the first column
-                            Object missionName = missionsTable.getModel().getValueAt(row, 1);  // Get Name from the second column
-                            Object missionDescription = missionsTable.getModel().getValueAt(row, 2);  // Get Age from the third column
-                            Object missionStatus = missionsTable.getModel().getValueAt(row, 3);
-                            System.out.println(missionId + " " + missionName + " \n" + missionDescription + " " + missionStatus);
-                            showMissionModal((String) missionId, (String) missionName, (String) missionDescription, (String) missionStatus);
-                        }
-                    }
-                }
-            });
 
         });
 
         voirMissionsEnCoursButton.addActionListener(e -> {
-            DefaultTableModel tableModel = new DefaultTableModel() {
+            missionsTable.removeMouseListener(mouseAdapterTab1);
+            missionsTable.addMouseListener(mouseAdapterTab2);
+
+
+            DefaultTableModel tableModel = new DefaultTableModel(MainInterface.columnNames, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
                     return false;
@@ -109,75 +162,85 @@ public class BenevoleGUI extends JFrame {
 
             // Set the table model to the JTable
             missionsTable.setModel(tableModel);
-            // Disable cell selection
+            // Disable cell and row selection
             missionsTable.setCellSelectionEnabled(false);
-
-            // Disable row selection by overriding the ListSelectionModel
             missionsTable.setRowSelectionAllowed(false);
-            missionsTable.setColumnSelectionAllowed(false);
             missionsTable.removeColumn(missionsTable.getColumnModel().getColumn(0));  // This will hide the first column (ID)
             missionTableLabel.setText("Missions en cours");
             missionTableLabel.setVisible(true);
             missionTableLabel.setVisible(true);
         });
-
-        voirMissionsRealiseesButton.addActionListener(e -> {
-            DefaultTableModel tableModel = new DefaultTableModel() {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-
-            tableModel.setColumnIdentifiers(MainInterface.columnNames);
-            tableModel.addRow(MainInterface.columnNames);
-            String[][] missionsData = missionService.getMissionsDataByVolunteerAndStatus(userConnected.getUserID(), Mission.STATUS.REALISED.toString());
-            for (String[] missionsDatum : missionsData) {
-                tableModel.addRow(missionsDatum);
-            }
-
-            // Set the table model to the JTable
-            missionsTable.setModel(tableModel);
-            // Disable cell selection
-            missionsTable.setCellSelectionEnabled(false);
-
-            // Disable row selection by overriding the ListSelectionModel
-            missionsTable.setRowSelectionAllowed(false);
-            missionsTable.setColumnSelectionAllowed(false);
-            missionsTable.removeColumn(missionsTable.getColumnModel().getColumn(0));  // This will hide the first column (ID)
-            missionTableLabel.setText("Missions realisees");
-            missionTableLabel.setVisible(true);
-            missionTableLabel.setVisible(true);
-        });
     }
 
+    static MouseAdapter getMouseAdapter(JTable missionsTable, int indice) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Check if the event is a double-click
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();  // Prevent further processing if needed
+
+                    // Get the index of the clicked row
+                    int row = missionsTable.getSelectedRow();
+
+                    // If the row is valid (not -1), do something
+                    if (row != -1) {
+                        // Example action: print row data
+                        Object missionId = missionsTable.getModel().getValueAt(row, 0);  // Get ID from the first column
+                        Object missionName = missionsTable.getModel().getValueAt(row, 1);  // Get Name from the second column
+                        Object missionDescription = missionsTable.getModel().getValueAt(row, 2);  // Get Age from the third column
+                        Object missionStatus = missionsTable.getModel().getValueAt(row, 3);
+                        System.out.println(missionId + " " + missionName + " \n" + missionDescription + " " + missionStatus);
+                        showMissionModal((String) missionId, (String) missionName, (String) missionDescription, (String) missionStatus, indice);
+                    }
+                }
+            }
+        };
+    }
+
+    public ArrayList<JTextComponent> getTextComponents() {
+        ArrayList<JTextComponent> textComponents = new ArrayList<>();
+        textComponents.add(reviewTextArea);
+        return textComponents;
+    }
 
     // Method to show modal dialog with mission details
-    private static void showMissionModal(String missionID, String missionName, String missionDescription, String missionStatus) {
+    private static void showMissionModal(String missionID, String missionName, String missionDescription, String missionStatus, int indice) {
         // Create a modal dialog
         JDialog dialog = new JDialog();
         dialog.setTitle("Mission Details");
         dialog.setModal(true);
-        dialog.setSize(300, 200);
+        dialog.setSize(400, 300);
         dialog.setLocationRelativeTo(null);
 
-        // Create labels and buttons for the dialog
-        JLabel labelMissionName = new JLabel("Mission Name: " + missionName);
-        JLabel labelMissionDescription = new JLabel("Description: " + missionDescription);
-        JLabel labelMissionStatus = new JLabel("Status: " + missionStatus);
+        // Create labels and text components
+        JLabel labelMissionName = new JLabel("Mission Name: ");
+        JTextArea missionNameTextArea = new JTextArea(3, 20);
+        missionNameTextArea.setEditable(false);
+        missionNameTextArea.setLineWrap(true);
+        missionNameTextArea.setWrapStyleWord(true);
+        missionNameTextArea.setText(missionName);
+        JScrollPane missionNameScrollPane = new JScrollPane(missionNameTextArea); // Add scroll pane for the JTextArea
 
+        JLabel labelMissionDescription = new JLabel("Description: ");
+        JTextArea missionDescriptionTextArea = new JTextArea(5, 20);
+        missionDescriptionTextArea.setEditable(false);
+        missionDescriptionTextArea.setLineWrap(true);
+        missionDescriptionTextArea.setWrapStyleWord(true);
+        missionDescriptionTextArea.setText(missionDescription);
+        JScrollPane missionDescriptionScrollPane = new JScrollPane(missionDescriptionTextArea); // Add scroll pane for the JTextArea
+
+        JLabel labelMissionStatus = new JLabel("Status: ");
+        JTextField missionStatusTextField = new JTextField(20);
+        missionStatusTextField.setEditable(false);
+        missionStatusTextField.setText(missionStatus);
+
+        // Create buttons
         JButton acceptButton = new JButton("Accept");
         JButton closeButton = new JButton("Close");
 
-        // Panel to hold buttons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(acceptButton);
-        buttonPanel.add(closeButton);
-
-        // Add action listener to close button
+        // Add action listeners to buttons
         closeButton.addActionListener(e -> dialog.dispose());
-
-        // Add action listener to accept button (you can add logic to accept the mission here)
         acceptButton.addActionListener(e -> {
             boolean isAssigned = missionService.assignVolunteerToMission(Integer.parseInt(missionID), userConnected.getUserID());
 
@@ -189,24 +252,52 @@ public class BenevoleGUI extends JFrame {
             dialog.dispose();
         });
 
-        // Add components to the dialog
-        dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
-        dialog.add(labelMissionName);
-        dialog.add(labelMissionDescription);
-        dialog.add(labelMissionStatus);
-        dialog.add(buttonPanel);
+        // Set up GridBagLayout
+        dialog.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Row 1: Mission Name
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        dialog.add(labelMissionName, gbc);
+
+        gbc.gridx = 1;
+        dialog.add(missionNameScrollPane, gbc);
+
+        // Row 2: Mission Description
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        dialog.add(labelMissionDescription, gbc);
+
+        gbc.gridx = 1;
+        dialog.add(missionDescriptionScrollPane, gbc);
+
+        // Row 3: Mission Status
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        dialog.add(labelMissionStatus, gbc);
+
+        gbc.gridx = 1;
+        dialog.add(missionStatusTextField, gbc);
+
+        // Row 4: Buttons
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(closeButton);
+
+        if (indice != 0) dialog.add(buttonPanel, gbc);
 
         // Show the dialog
         dialog.setVisible(true);
     }
 
-    public JPanel getPanel() {
-        return this.panel;
-    }
-
-    public void setUserConnected(User user) {
-        userConnected = user;
-    }
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -224,7 +315,7 @@ public class BenevoleGUI extends JFrame {
      */
     private void $$$setupUI$$$() {
         panel = new JPanel();
-        panel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 3, new Insets(10, 10, 10, 10), -1, -1));
+        panel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(6, 4, new Insets(10, 10, 10, 10), -1, -1));
         panel.setBorder(BorderFactory.createTitledBorder(null, "Benevole page", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         seDeconnecterButton = new JButton();
         seDeconnecterButton.setText("Se déconnecter");
@@ -236,11 +327,8 @@ public class BenevoleGUI extends JFrame {
         panel.add(voirMissionsButton, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         missionsTable = new JTable();
         panel.add(missionsTable, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 3, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
-        voirMissionsRealiseesButton = new JButton();
-        voirMissionsRealiseesButton.setText("Voir missions realisées");
-        panel.add(voirMissionsRealiseesButton, new com.intellij.uiDesigner.core.GridConstraints(2, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         voirMissionsEnCoursButton = new JButton();
-        voirMissionsEnCoursButton.setText("Voir missions en cours");
+        voirMissionsEnCoursButton.setText("Voir mes missions acceptées");
         panel.add(voirMissionsEnCoursButton, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         missionTableLabel = new JLabel();
         missionTableLabel.setText("");
@@ -248,6 +336,19 @@ public class BenevoleGUI extends JFrame {
         panel.add(missionTableLabel, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
         panel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        donnerMonAvisButton = new JButton();
+        donnerMonAvisButton.setText("Donner mon avis");
+        panel.add(donnerMonAvisButton, new com.intellij.uiDesigner.core.GridConstraints(2, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        reviewTextArea = new JTextArea();
+        reviewTextArea.setLineWrap(true);
+        reviewTextArea.setVisible(false);
+        panel.add(reviewTextArea, new com.intellij.uiDesigner.core.GridConstraints(5, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        soumettreButton = new JButton();
+        soumettreButton.setText("Soumettre");
+        soumettreButton.setVisible(false);
+        panel.add(soumettreButton, new com.intellij.uiDesigner.core.GridConstraints(5, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scrollBar1 = new JScrollBar();
+        panel.add(scrollBar1, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 6, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**

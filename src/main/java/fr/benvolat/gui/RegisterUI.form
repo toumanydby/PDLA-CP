@@ -108,6 +108,7 @@
           <model>
             <item value="BENEVOLE"/>
             <item value="DEMANDEUR"/>
+            <item value="MODERATEUR"/>
           </model>
         </properties>
       </component>

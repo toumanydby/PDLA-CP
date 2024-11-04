@@ -2,12 +2,9 @@ package fr.benvolat.service;
 
 import fr.benvolat.dao.MissionDataAccess;
 import fr.benvolat.models.Mission;
-import fr.benvolat.models.User;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.function.Predicate;
 
 public class MissionService {
 
@@ -40,46 +37,35 @@ public class MissionService {
         return bool;
     }
 
-    // Method to get all pending help requests
-    public ArrayList<Mission> getPendingMissionsRequests() {
-        return missionDAO.findMissionsRequestsByStatus("Pending");
-    }
-
-    public boolean moderateMission(int missionId, Mission.STATUS status){
+    public boolean moderateMission(int missionId, Mission.STATUS status, String motifRefus) {
         boolean res = false;
         Mission request = missionDAO.findMissionRequestById(missionId);
 
-        if(request != null){
+        if (request != null) {
             request.setStatus(status);
+            if(status.equals(Mission.STATUS.REFUSED)) request.setMotifRefus(motifRefus);
             res = missionDAO.updateMissionRequest(request);
         }
 
         return res;
     }
 
-    public ArrayList<Mission> getMissionsByUserId(int userId) {
-        return missionDAO.getMissionsByUserId(userId);
-    }
-
-    public String[][] getUserMissionsData(int userId){
-        ArrayList<Mission> missionArrayList = missionDAO.getMissionsByUserId(userId);
-        return getStringsArrays(missionArrayList);
-    }
-
-    public String[][] getMissionsDataByStatus(String status){
+    public String[][] getMissionsDataByStatus(String status) {
         ArrayList<Mission> missionArrayList = missionDAO.findMissionsRequestsByStatus(status);
         return getStringsArrays(missionArrayList);
     }
 
-    public String[][] getMissionsDataByVolunteer(int volunteerId){
+    public String[][] getMissionsDataByVolunteer(int volunteerId) {
         ArrayList<Mission> missionArrayList = missionDAO.getMissionsByVolunteerId(volunteerId);
         return getStringsArrays(missionArrayList);
     }
 
-    public String[][] getMissionsDataByVolunteerAndStatus(int volunteerId, String status) {
-        ArrayList<Mission> missionArrayList = missionDAO.getMissionsByVolunteerIdAndStatus(volunteerId,status);
+    public String[][] getMissionsDataByUserId(int userId) {
+        ArrayList<Mission> missionArrayList = missionDAO.getMissionsByUserId(userId);
         return getStringsArrays(missionArrayList);
     }
+
+
     private String[][] getStringsArrays(ArrayList<Mission> missionArrayList) {
         ArrayList<ArrayList<String>> missionData = new ArrayList<>();
         for (Mission mission : missionArrayList) {

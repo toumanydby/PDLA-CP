@@ -2,7 +2,7 @@ package fr.benvolat.models;
 
 public class Mission {
 
-    public enum STATUS{
+    public enum STATUS {
         PENDING, VALIDATE, REALISED, REFUSED
     }
 
@@ -14,7 +14,7 @@ public class Mission {
     private int requesterID;
     private int volunteerID;
 
-    public Mission(int id, String name,int requesterID, String description, String status, int volunteerID, String motifRefus ) {
+    public Mission(int id, String name, int requesterID, String description, String status, int volunteerID, String motifRefus) {
         this.missionID = id;
         this.name = name;
         this.description = description;
@@ -25,7 +25,7 @@ public class Mission {
     }
 
 
-    public Mission(String name,int requesterID, String description) {
+    public Mission(String name, int requesterID, String description) {
         this.name = name;
         this.description = description;
         this.status = STATUS.PENDING.toString();
@@ -65,7 +65,7 @@ public class Mission {
         return volunteerID;
     }
 
-    public void setVolunteerID(int volunteerID){
+    public void setVolunteerID(int volunteerID) {
         this.volunteerID = volunteerID;
     }
 
@@ -74,9 +74,9 @@ public class Mission {
     }
 
     public void setMotifRefus(String motifRefus) {
-        if(this.status.equals(STATUS.REFUSED.toString())){
+        if (this.status.equals(STATUS.REFUSED.toString())) {
             this.motifRefus = motifRefus;
-        } else{
+        } else {
             System.out.println("La mission doit etre refusee pour qu'un motif soit place");
         }
     }

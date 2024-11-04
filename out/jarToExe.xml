@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>D:\cours\projects4IR\PDLA-CP\target\PDLA-CP-1.0-SNAPSHOT.jar</jar>
+  <outfile>D:\cours\projects4IR\PDLA-CP\out\benevoleApp.exe</outfile>
+  <errTitle>Download the newest version of Java</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>high</priority>
+  <downloadUrl>https://www.java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>true</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <singleInstance>
+    <mutexName>volunteerMutex</mutexName>
+    <windowTitle></windowTitle>
+  </singleInstance>
+  <jre>
+    <path>%JAVA_HOME%</path>
+    <requiresJdk>true</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>1.8</minVersion>
+    <maxVersion></maxVersion>
+  </jre>
+  <messages>
+    <startupErr>An error occurred while starting the application.</startupErr>
+    <jreNotFoundErr>This application requires a Java Runtime Environment.</jreNotFoundErr>
+    <jreVersionErr>JRE VERSION ERROR</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>

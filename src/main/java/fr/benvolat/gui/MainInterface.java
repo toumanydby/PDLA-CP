@@ -5,8 +5,6 @@ import fr.benvolat.models.User;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -15,10 +13,9 @@ public class MainInterface extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private static ArrayList<JFrame> frames = new ArrayList<>();
-    private RegisterUI registerUI;
-    private SignInUI signInUI;
-    private UserGUI userGUI;
-    private BenevoleGUI benevoleGUI;
+    private final UserGUI userGUI;
+    private final BenevoleGUI benevoleGUI;
+    private final ModeratorGUI moderatorGUI;
     public static final int frameWidth = 600;
     public static final int frameHeight = 400;
 
@@ -29,40 +26,43 @@ public class MainInterface extends JFrame {
         // Set title and default close operation
         setTitle("Volunteer App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(new Dimension(frameWidth,frameHeight));
+        setSize(new Dimension(frameWidth, frameHeight));
         setLocationRelativeTo(null);  // Center the window
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
         // Create instances of your other UI panels
-        registerUI = new RegisterUI(this);  // Pass MainInterface as argument
-        signInUI = new SignInUI(this);
-        userGUI = new UserGUI(this,null);
-        benevoleGUI = new BenevoleGUI(this,null);
+        RegisterUI registerUI = new RegisterUI(this);  // Pass MainInterface as argument
+        SignInUI signInUI = new SignInUI(this);
+        userGUI = new UserGUI(this, null);
+        benevoleGUI = new BenevoleGUI(this, null);
+        moderatorGUI = new ModeratorGUI(this, null);
 
         frames.add(this);
         frames.add(registerUI);
         frames.add(signInUI);
         frames.add(userGUI);
         frames.add(benevoleGUI);
+        frames.add(moderatorGUI);
 
         // Add panels to contentPanel with unique identifiers
         mainPanel.add(createMainMenuPanel(), "MainMenu");
         mainPanel.add(registerUI.getPanel(), "Register");
         mainPanel.add(signInUI.getPanel(), "SignIn");
         mainPanel.add(userGUI.getPanel(), "User");
-        mainPanel.add(benevoleGUI.getPanel(),"Benevole");
+        mainPanel.add(benevoleGUI.getPanel(), "Benevole");
+        mainPanel.add(moderatorGUI.getPanel(), "Moderator");
 
-        add(mainPanel,BorderLayout.SOUTH);
+        add(mainPanel);
         // Set default panel
-        showPanel("MainMenu",null);
+        showPanel("MainMenu", null);
     }
 
-    public JPanel getMainPanel(){
+    public JPanel getMainPanel() {
         return mainPanel;
     }
 
-    public JFrame getFrame( int position){
+    public JFrame getFrame(int position) {
         return frames.get(position);
     }
 
@@ -70,34 +70,39 @@ public class MainInterface extends JFrame {
     private JPanel createMainMenuPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 1, 10, 10));  // Two rows, one column
+        // Load the logo image
+        ImageIcon logoIcon = new ImageIcon("src/main/resources/images/logo.png");  // Replace with the actual path to your logo
+
+        // Resize the image if needed (optional)
+        Image logoImage = logoIcon.getImage().getScaledInstance(250, 200, Image.SCALE_SMOOTH); // Resizing the image
+        ImageIcon resizedLogoIcon = new ImageIcon(logoImage);
+
+        // Create a JLabel to hold the logo
+        JLabel logoLabel = new JLabel(resizedLogoIcon);
+
+        // Center the logo within the panel (optional)
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        logoLabel.setVerticalAlignment(JLabel.CENTER);
 
         JButton registerButton = new JButton("Register");
         JButton signInButton = new JButton("Sign In");
 
-        registerButton.setFont(new Font("Arial", Font.PLAIN, 12));
-        signInButton.setFont(new Font("Arial", Font.PLAIN, 12));
-//        registerButton.setSize(60, 72);
-        registerButton.setBounds(10,10,250,100);
-        signInButton.setBounds(10,10,250,100);
-//        signInButton.setSize(42, 72);
-        panel.add(registerButton);
-        panel.add(signInButton);
+        registerButton.setFont(new Font("Arial", Font.BOLD, 14));
+        signInButton.setFont(new Font("Arial", Font.BOLD, 14));
+        registerButton.setBounds(15, 15, 300, 150);
+        signInButton.setBounds(15, 15, 300, 150);
+        JPanel buttonPanel = new JPanel();
 
+        buttonPanel.add(registerButton);
+        buttonPanel.add(signInButton);
+
+        // Add the logo to the top of the panel
+        panel.add(logoLabel, BorderLayout.NORTH);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
         // Switch to Register panel
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showPanel("Register",null);
-            }
-        });
-
+        registerButton.addActionListener(e -> showPanel("Register", null));
         // Switch to Sign In panel
-        signInButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showPanel("SignIn",null);
-            }
-        });
+        signInButton.addActionListener(e -> showPanel("SignIn", null));
 
         return panel;
     }
@@ -107,72 +112,30 @@ public class MainInterface extends JFrame {
             case "User" -> userGUI.setUserConnected(user);
             case "Benevole" -> benevoleGUI.setUserConnected(user);
             //case "Admin" ->
-            //case "Moderateur" ->
+            case "Moderator" -> moderatorGUI.setUserConnected(user);
         }
         cardLayout.show(mainPanel, title);
-    }
-
-
-    public static JDialog createDialogModal(final JFrame frame, String title, String contenu) {
-        JDialog dialog = new JDialog(frame, title, true);
-        dialog.setBounds(50,50,60,60);
-        Container dialogContentPane = dialog.getContentPane();
-        dialogContentPane.setLayout(new BorderLayout());
-        JLabel txtBut = new JLabel(
-                contenu,
-                JLabel.CENTER
-        );
-        txtBut.setFont(new Font("Serif", Font.PLAIN, 10));
-        txtBut.setForeground(new Color(0x111010));
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
-        JButton okButton = new JButton("CLOSE");
-        okButton.addActionListener(actionEvent -> dialog.setVisible(false));
-        panel.add(okButton);
-
-        dialogContentPane.add(txtBut, BorderLayout.CENTER);
-        dialogContentPane.add(panel, BorderLayout.SOUTH);
-        dialog.setVisible(true);
-
-        return dialog;
     }
 
     public void reset() {
         // for all JTextFields and JTextAreas
         ArrayList<JTextComponent> textComponents = null;
-        for (JFrame frame:frames){
-            if(frame instanceof RegisterUI){
+        for (JFrame frame : frames) {
+            if (frame instanceof RegisterUI) {
                 textComponents = ((RegisterUI) frame).getTextComponents();
-            } else if(frame instanceof SignInUI){
+            } else if (frame instanceof SignInUI) {
                 textComponents = ((SignInUI) frame).getTextComponents();
-            } else if(frame instanceof UserGUI){
+            } else if (frame instanceof UserGUI) {
                 textComponents = ((UserGUI) frame).getTextComponents();
-            }/* else if(frame instanceof BenevoleGUI){
-                ArrayList<JTextComponent> textComponents = ((BenevoleGUI) frame).getTextComponents();
-            }*/
+            } else if (frame instanceof fr.benvolat.gui.ModeratorGUI) {
+                textComponents = ((fr.benvolat.gui.ModeratorGUI) frame).getTextComponents();
+            }
 
-            if(textComponents != null){
-                for (JTextComponent textComponent: textComponents){
+            if (textComponents != null) {
+                for (JTextComponent textComponent : textComponents) {
                     textComponent.setText("");
                 }
             }
         }
     }
-
-    public static void main(String[] args)  {
-        // Run the GUI in the Event Dispatch Thread
-
-        SwingUtilities.invokeLater(()->{
-            MainInterface mainInterface;
-            try {
-                mainInterface = new MainInterface();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            mainInterface.setVisible(true);
-        });
-    }
-
-
 }

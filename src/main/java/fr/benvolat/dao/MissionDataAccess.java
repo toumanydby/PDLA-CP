@@ -1,6 +1,6 @@
 package fr.benvolat.dao;
 
-import fr.benvolat.models.*;
+import fr.benvolat.models.Mission;
 import fr.benvolat.utils.DBConnection;
 
 import java.sql.Connection;
@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Types;
 
 public class MissionDataAccess {
 
@@ -22,14 +23,14 @@ public class MissionDataAccess {
         boolean bool = false;
         try (PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, mission.getName());
-            statement.setInt(2,mission.getRequesterID());
+            statement.setInt(2, mission.getRequesterID());
             statement.setString(3, mission.getDescription());
             statement.setString(4, mission.getStatus());
 
             int rowAff = statement.executeUpdate();
-            if(rowAff > 0 ){
-                try(ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                    if(generatedKeys.next()) {
+            if (rowAff > 0) {
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
                         mission.setMissionID(generatedKeys.getInt(1));
                         bool = true;
                     }
@@ -43,7 +44,7 @@ public class MissionDataAccess {
 
     public boolean updateMissionRequest(Mission mission) {
         boolean bool = false;
-        String query = "UPDATE INTO Missions_requests " +
+        String query = "UPDATE Missions_requests " +
                 "SET name = ?," +
                 " requester_id = ?," +
                 " description = ?," +
@@ -52,13 +53,19 @@ public class MissionDataAccess {
                 " motif_refus = ? " +
                 "WHERE id = ?";
 
-        try(PreparedStatement st = connection.prepareStatement(query)){
-            st.setString(1,mission.getName());
-            st.setInt(2,mission.getRequesterID());
-            st.setString(3,mission.getDescription());
-            st.setString(4,mission.getStatus());
-            st.setInt(5,mission.getVolunteerID());
-            st.setString(6,mission.getMotifRefus());
+
+        try (PreparedStatement st = connection.prepareStatement(query)) {
+            st.setString(1, mission.getName());
+            st.setInt(2, mission.getRequesterID());
+            st.setString(3, mission.getDescription());
+            st.setString(4, mission.getStatus());
+            if(mission.getVolunteerID() == 0){
+                st.setNull(5, Types.INTEGER);
+            } else{
+                st.setInt(5, mission.getVolunteerID());
+            }
+            st.setString(6, mission.getMotifRefus());
+            st.setInt(7, mission.getMissionID());
             st.executeUpdate();
             bool = true;
         } catch (SQLException e) {
@@ -73,10 +80,10 @@ public class MissionDataAccess {
 
         String query = "SELECT * FROM Missions_requests WHERE status = ?";
 
-        try(PreparedStatement st = connection.prepareStatement(query)){
-            st.setString(1,status);
+        try (PreparedStatement st = connection.prepareStatement(query)) {
+            st.setString(1, status);
             ResultSet rs = st.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 missions.add(getMissions(rs));
             }
         } catch (SQLException e) {
@@ -89,11 +96,11 @@ public class MissionDataAccess {
     public Mission findMissionRequestById(int missionID) {
         Mission mission = null;
         String query = "SELECT * FROM Missions_requests WHERE id = ?";
-        try(PreparedStatement st = connection.prepareStatement(query)){
-            st.setInt(1,missionID);
+        try (PreparedStatement st = connection.prepareStatement(query)) {
+            st.setInt(1, missionID);
             ResultSet rs = st.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
                 mission = getMissions(rs);
             }
         } catch (SQLException e) {
@@ -101,30 +108,6 @@ public class MissionDataAccess {
         }
         return mission;
     }
-
-    /**
-     *  Fonction permettant de trouver toutes les missions
-     * @return Une ArrayList contenant les differentes missions de l'appli
-     */
-    public ArrayList<Mission> getAllMissions() {
-        ArrayList<Mission> missionsList = new ArrayList<>();
-        String query = "SELECT * FROM Missions_requests";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()
-        ) {
-            Mission mission;
-            while (rs.next()) {
-                mission = getMissions(rs);
-                missionsList.add(mission);
-            }
-        }
-        catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return missionsList;
-    }
-
 
     public ArrayList<Mission> getMissionsByUserId(int userId) {
         ArrayList<Mission> missionsList = new ArrayList<>();
@@ -145,16 +128,15 @@ public class MissionDataAccess {
         String query = "SELECT * FROM Missions_requests WHERE volunteer_id = ? AND status = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)
         ) {
-            stmt.setInt(1,volunteerId);
-            stmt.setString(2,status);
+            stmt.setInt(1, volunteerId);
+            stmt.setString(2, status);
             ResultSet rs = stmt.executeQuery();
             Mission mission;
             while (rs.next()) {
                 mission = getMissions(rs);
                 missionsList.add(mission);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return missionsList;
@@ -163,15 +145,14 @@ public class MissionDataAccess {
     private ArrayList<Mission> getMissions(int userId, ArrayList<Mission> missionsList, String query) {
         try (PreparedStatement stmt = connection.prepareStatement(query)
         ) {
-            stmt.setInt(1,userId);
+            stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             Mission mission;
             while (rs.next()) {
                 mission = getMissions(rs);
                 missionsList.add(mission);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return missionsList;
@@ -179,12 +160,13 @@ public class MissionDataAccess {
 
     /**
      * Fonction nous permettant de retrouver une mission a partir d'une requete vers la base de donne
+     *
      * @param rs Resultat de la requete sql executee
      * @return mission trouve en fonction de la requete ou null
      */
     private Mission getMissions(ResultSet rs) {
         Mission mission = null;
-        try{
+        try {
             mission = new Mission(
                     rs.getInt("id"),
                     rs.getString("name"),

@@ -1,6 +1,9 @@
 package fr.benvolat.dao;
 
-import fr.benvolat.models.*;
+import fr.benvolat.models.Admin;
+import fr.benvolat.models.Benevole;
+import fr.benvolat.models.Moderateur;
+import fr.benvolat.models.User;
 import fr.benvolat.utils.DBConnection;
 
 import java.sql.*;
@@ -11,7 +14,6 @@ public class UserDataAccess {
     private final Connection connection;
 
     /**
-     *
      * @throws SQLException
      */
     public UserDataAccess() throws SQLException {
@@ -28,15 +30,16 @@ public class UserDataAccess {
             stmt.setString(4, user.getUserRole());
 
             int rowAffected = stmt.executeUpdate();
-            if(rowAffected > 0){
-                try(ResultSet rs = stmt.getGeneratedKeys()) {
-                    if(rs.next()){
+            if (rowAffected > 0) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
                         user.setUserID(rs.getInt(1));
                     }
                 } catch (SQLException e) {
-                    System.out.println(e.getMessage());;
+                    System.out.println(e.getMessage());
+                    ;
                 }
-                System.out.println( user.getUserRole() + " created");
+                System.out.println(user.getUserRole() + " created");
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -46,15 +49,16 @@ public class UserDataAccess {
 
     /**
      * Retrouve un utilisateur a partir de son adresse mail
+     *
      * @param email adresse email de l'utilisateur que vous rechercher, ( email unique par user )
      * @return user trouve ou null
      */
     public User findUserByEmail(String email) {
         String query = "SELECT * FROM Users WHERE email = ?";
-        try(PreparedStatement st = connection.prepareStatement(query);){
-            st.setString(1,email);
+        try (PreparedStatement st = connection.prepareStatement(query);) {
+            st.setString(1, email);
             ResultSet rs = st.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 return getUser(rs);
             }
         } catch (SQLException e) {
@@ -64,7 +68,8 @@ public class UserDataAccess {
     }
 
     /**
-     *  Fonction permettant de trouver tous les utilisateurs
+     * Fonction permettant de trouver tous les utilisateurs
+     *
      * @return Une ArrayList contenant les differents User de l'appli
      */
     public ArrayList<User> getAllUsers() {
@@ -79,8 +84,7 @@ public class UserDataAccess {
                 user = getUser(rs);
                 usersList.add(user);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return usersList;
@@ -88,13 +92,14 @@ public class UserDataAccess {
 
     /**
      * Fonction nous permettant de retrouver un utilisateur a partir d'une requete vers la base de donne
+     *
      * @param rs Resultat de la requete sql executee
      * @return Utilisateur trouve en fonction de la requete ou null
      */
     private User getUser(ResultSet rs) {
         User user = null;
-        try{
-            user = switch (rs.getString("role")){
+        try {
+            user = switch (rs.getString("role")) {
                 case "ADMIN" -> new Admin(
                         rs.getInt("id"),
                         rs.getString("name"),
@@ -129,21 +134,20 @@ public class UserDataAccess {
     }
 
 
-
     public boolean updateUser(User user) {
         boolean bool = false;
-        String query = "UPDATE INTO Missions_requests " +
+        String query = "UPDATE Missions_requests " +
                 "SET name = ?," +
                 " email = ?," +
                 " password = ?," +
                 " role = ?," +
                 "WHERE id = ?";
 
-        try(PreparedStatement st = connection.prepareStatement(query)){
+        try (PreparedStatement st = connection.prepareStatement(query)) {
             st.setString(1, user.getName());
-            st.setString(2,user.getEmail());
-            st.setString(3,user.getPassword());
-            st.setString(4,user.getUserRole());
+            st.setString(2, user.getEmail());
+            st.setString(3, user.getPassword());
+            st.setString(4, user.getUserRole());
             st.executeUpdate();
             bool = true;
         } catch (SQLException e) {
@@ -156,13 +160,28 @@ public class UserDataAccess {
     public boolean deleteUser(int userId) {
         boolean bool = false;
         String query = "DELETE FROM Users WHERE id = ?";
-        try(PreparedStatement st = connection.prepareStatement(query)){
+        try (PreparedStatement st = connection.prepareStatement(query)) {
             st.setInt(1, userId);
             st.executeUpdate();
             bool = true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+        return bool;
+    }
+
+    public boolean sendReview(int userID, String review) {
+        boolean bool = false;
+        String query = "INSERT INTO UsersReviews (user_id, review) VALUES (?, ?)";
+        try (PreparedStatement st = connection.prepareStatement(query)) {
+            st.setInt(1, userID);
+            st.setString(2, review);
+            st.executeUpdate();
+            bool = true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
         return bool;
     }
 }

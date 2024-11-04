@@ -19,8 +19,8 @@ public class UserService {
     public boolean registerUser(String name, String email, String password, String role) {
         boolean result = false;
         // There is no user registered with that email
-        if( userDAO.findUserByEmail(email) == null){
-            switch (role){
+        if (userDAO.findUserByEmail(email) == null) {
+            switch (role) {
                 case "ADMIN":
                     userDAO.addUser(new Admin(name, email, password));
                     break;
@@ -39,34 +39,34 @@ public class UserService {
         return result;
     }
 
-    public User authenticateUser(String email, String password){
+    public User authenticateUser(String email, String password) {
         User user = userDAO.findUserByEmail(email);
-        if(user != null && user.getPassword().equals(password)){
+        if (user != null && user.getPassword().equals(password)) {
             return user;
         }
         return null;
     }
 
-    public boolean updateUser(String email){
+    public boolean updateUser(String email) {
         boolean result = false;
         User user = userDAO.findUserByEmail(email);
-        if( user != null){
+        if (user != null) {
             result = userDAO.updateUser(user);
         }
         return result;
     }
 
-    public boolean deleteUser(String email){
+    public boolean deleteUser(String email) {
         boolean result = false;
         User us = userDAO.findUserByEmail(email);
-        if( us != null){
+        if (us != null) {
             result = userDAO.deleteUser(us.getUserID());
         }
         return result;
     }
 
 
-
-
-
+    public boolean sendRewiew(int userID, String review) {
+        return userDAO.sendReview(userID, review);
+    }
 }

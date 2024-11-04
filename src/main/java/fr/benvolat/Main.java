@@ -1,26 +1,26 @@
 package fr.benvolat;
 
-import fr.benvolat.dao.MissionDataAccess;
-import fr.benvolat.dao.UserDataAccess;
-import fr.benvolat.models.Admin;
-import fr.benvolat.models.Mission;
-import fr.benvolat.models.User;
+import fr.benvolat.gui.MainInterface;
+import fr.benvolat.utils.DBConnection;
 
+import javax.swing.*;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Main {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
+        AtomicReference<MainInterface> main = new AtomicReference<>();
+        DBConnection.initDB();
 
-        UserDataAccess userDAO = new UserDataAccess();
-        MissionDataAccess missionDAO = new MissionDataAccess();
-        User adminUser = new Admin("Aurelien", "anglade@insa-toulouse.fr", "1234567asd");
-        userDAO.addUser(adminUser);
-        User userRomain = new User("Romain", "romain.dubois@gmail.com", "romain29403");
-        userDAO.addUser(userRomain);
-        int romainId = userRomain.getUserID();
-
-        Mission m1 = new Mission("Aide pour personnes agees", romainId, "J'ai besoin d'aide pour effectuer un deplacement de certaines de mes affaires depuis mon ancien centre hospitalier au nouveau, je n'ai que trois valises et quelques cartons, merci d'avance pour votre aide");
-        missionDAO.addMissionRequest(m1);
+        // Run the GUI in the Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> {
+            try {
+                main.set(new MainInterface());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            main.get().setVisible(true);
+        });
     }
 }

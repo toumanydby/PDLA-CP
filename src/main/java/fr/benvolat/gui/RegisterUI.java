@@ -8,8 +8,6 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -48,6 +46,10 @@ public class RegisterUI extends JFrame {
             if (role.equalsIgnoreCase("DEMANDEUR")) {
                 role = "USER";
             }
+            if (role.equalsIgnoreCase("MODERATEUR")) {
+                role = "MODERATOR";
+            }
+
             if (name.isEmpty() || userName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(mainInterface, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -139,6 +141,7 @@ public class RegisterUI extends JFrame {
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
         defaultComboBoxModel1.addElement("BENEVOLE");
         defaultComboBoxModel1.addElement("DEMANDEUR");
+        defaultComboBoxModel1.addElement("MODERATEUR");
         comboBox1.setModel(defaultComboBoxModel1);
         panel.add(comboBox1, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         resetButtuon = new JButton();
