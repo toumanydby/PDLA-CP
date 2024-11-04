@@ -19,7 +19,6 @@ import java.util.ArrayList;
 public class BenevoleGUI extends JFrame {
     private JButton seDeconnecterButton;
     private JButton voirMissionsButton;
-   // private JButton voirMissionsRealiseesButton;
     private JTable missionsTable;
     private JButton voirMissionsEnCoursButton;
     private JLabel missionTableLabel;
