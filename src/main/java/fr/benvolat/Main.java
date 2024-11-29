@@ -10,17 +10,12 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Main {
 
     public static void main(String[] args) {
-        AtomicReference<MainInterface> main = new AtomicReference<>();
-        DBConnection.initDB();
 
-        // Run the GUI in the Event Dispatch Thread
+        DBConnection.initDB();
+        // Launch the main app
         SwingUtilities.invokeLater(() -> {
-            try {
-                main.set(new MainInterface());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            main.get().setVisible(true);
+            MainInterface main = new MainInterface();
+            main.setVisible(true);
         });
     }
 }

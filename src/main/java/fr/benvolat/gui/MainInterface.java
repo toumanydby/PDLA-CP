@@ -10,19 +10,19 @@ import java.util.ArrayList;
 
 public class MainInterface extends JFrame {
 
-    private CardLayout cardLayout;
-    private JPanel mainPanel;
-    private static ArrayList<JFrame> frames = new ArrayList<>();
-    private final UserGUI userGUI;
-    private final BenevoleGUI benevoleGUI;
-    private final ModeratorGUI moderatorGUI;
+    private final CardLayout cardLayout;
+    private final JPanel mainPanel;
+    private static final ArrayList<JFrame> frames = new ArrayList<>();
+    private UserGUI userGUI;
+    private BenevoleGUI benevoleGUI;
+    private ModeratorGUI moderatorGUI;
     public static final int frameWidth = 600;
     public static final int frameHeight = 400;
 
     // Column Names
     public static String[] columnNames = {"id", "Nom", "Description", "Status"};
 
-    public MainInterface() throws SQLException {
+    public MainInterface() {
         // Set title and default close operation
         setTitle("Volunteer App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,12 +32,19 @@ public class MainInterface extends JFrame {
         mainPanel = new JPanel(cardLayout);
 
         // Create instances of your other UI panels
-        RegisterUI registerUI = new RegisterUI(this);  // Pass MainInterface as argument
-        SignInUI signInUI = new SignInUI(this);
-        userGUI = new UserGUI(this, null);
-        benevoleGUI = new BenevoleGUI(this, null);
-        moderatorGUI = new ModeratorGUI(this, null);
-
+        SignInUI signInUI = null;
+        RegisterUI registerUI = null;
+        try{
+            registerUI = new RegisterUI(this);  // Pass MainInterface as argument
+            signInUI = new SignInUI(this);
+            userGUI = new UserGUI(this, null);
+            benevoleGUI = new BenevoleGUI(this, null);
+            moderatorGUI = new ModeratorGUI(this, null);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erreur lors du lancement de l'appli", "Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+            return;
+        }
         frames.add(this);
         frames.add(registerUI);
         frames.add(signInUI);
@@ -54,6 +61,7 @@ public class MainInterface extends JFrame {
         mainPanel.add(moderatorGUI.getPanel(), "Moderator");
 
         add(mainPanel);
+
         // Set default panel
         showPanel("MainMenu", null);
     }
@@ -62,9 +70,11 @@ public class MainInterface extends JFrame {
         return mainPanel;
     }
 
+/*
     public JFrame getFrame(int position) {
         return frames.get(position);
     }
+*/
 
 
     private JPanel createMainMenuPanel() {

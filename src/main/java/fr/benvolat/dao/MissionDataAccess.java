@@ -12,12 +12,20 @@ import java.sql.Types;
 
 public class MissionDataAccess {
 
-    private final Connection connection;
+    private Connection connection;
 
-    public MissionDataAccess() throws SQLException {
-        connection = DBConnection.getConnection();
+    public MissionDataAccess(){
+        try{
+            connection = DBConnection.getConnection();
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
     }
 
+    public Connection getConnection(){
+        return connection;
+    }
+    
     public boolean addMissionRequest(Mission mission) {
         String query = "INSERT INTO Missions_requests (name, requester_id, description, status) VALUES (?, ?, ?, ?)";
         boolean bool = false;
@@ -53,7 +61,6 @@ public class MissionDataAccess {
                 " motif_refus = ? " +
                 "WHERE id = ?";
 
-
         try (PreparedStatement st = connection.prepareStatement(query)) {
             st.setString(1, mission.getName());
             st.setInt(2, mission.getRequesterID());
@@ -75,6 +82,21 @@ public class MissionDataAccess {
         return bool;
     }
 
+    // public boolean removeMissionRequest(int missionID) {
+    //     String query = "DELETE FROM Missions_requests WHERE id = ?";
+    //     boolean isDeleted = false;
+    
+    //     try (PreparedStatement statement = connection.prepareStatement(query)) {
+    //         statement.setInt(1, missionID);
+    //         int rowsAffected = statement.executeUpdate();
+    //         isDeleted = rowsAffected > 0;
+    //     } catch (SQLException e) {
+    //         System.out.println(e.getMessage());
+    //     }
+    
+    //     return isDeleted;
+    // }
+    
     public ArrayList<Mission> findMissionsRequestsByStatus(String status) {
         ArrayList<Mission> missions = new ArrayList<>();
 
