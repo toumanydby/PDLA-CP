@@ -36,13 +36,12 @@ public class UserDataAccess {
                         user.setUserID(rs.getInt(1));
                     }
                 } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                    ;
+                    throw new RuntimeException(e);
                 }
                 System.out.println(user.getUserRole() + " created");
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -65,29 +64,6 @@ public class UserDataAccess {
             throw new RuntimeException(e);
         }
         return null;
-    }
-
-    /**
-     * Fonction permettant de trouver tous les utilisateurs
-     *
-     * @return Une ArrayList contenant les differents User de l'appli
-     */
-    public ArrayList<User> getAllUsers() {
-        ArrayList<User> usersList = new ArrayList<>();
-        String query = "SELECT * FROM Users";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()
-        ) {
-            User user = null;
-            while (rs.next()) {
-                user = getUser(rs);
-                usersList.add(user);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return usersList;
     }
 
     /**

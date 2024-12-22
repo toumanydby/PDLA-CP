@@ -39,6 +39,53 @@ public class MissionDataAccessTest {
     }
 
     @Test
+    public void testAddMissionRequestWithNull() {
+        Mission mission = null;
+        boolean result;
+        try{
+            result = missionDataAccess.addMissionRequest(mission);
+            assertFalse(result, "Adding a null mission should return false.");
+        }catch (NullPointerException e){
+            assertThrowsExactly(NullPointerException.class, () -> {
+                throw e;
+            });
+        }
+    }
+
+    @Test
+    public void testAddMissionRequestWithIncompleteData() {
+        Mission mission = new Mission();
+        mission.setRequesterID(8); // Missing name and description
+
+        boolean result = missionDataAccess.addMissionRequest(mission);
+
+        assertFalse(result, "Adding a mission with incomplete data should return false.");
+    }
+
+    // We can actually insert duplicate mission, but it will be different missions by the id.
+/*    @Test
+    public void testAddMissionRequestDuplicateEntry() {
+        Mission mission1 = new Mission();
+        mission1.setName("Duplicate Mission");
+        mission1.setRequesterID(8);
+        mission1.setDescription("First entry for duplicate test.");
+        mission1.setStatus(Mission.STATUS.PENDING);
+
+        boolean firstResult = missionDataAccess.addMissionRequest(mission1);
+        assertTrue(firstResult, "First insertion should succeed.");
+
+        Mission mission2 = new Mission();
+        mission2.setName("Duplicate Mission");
+        mission2.setRequesterID(8);
+        mission2.setDescription("Duplicate entry for duplicate test.");
+        mission2.setStatus(Mission.STATUS.PENDING);
+
+        boolean secondResult = missionDataAccess.addMissionRequest(mission2);
+
+        assertFalse(secondResult, "Adding a duplicate mission should return false.");
+    }*/
+
+    @Test
     public void testUpdateMissionRequest() {
         Mission mission = new Mission();
         mission.setMissionID(6); // Assume this ID exists

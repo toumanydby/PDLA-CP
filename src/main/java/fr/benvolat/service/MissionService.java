@@ -3,14 +3,13 @@ package fr.benvolat.service;
 import fr.benvolat.dao.MissionDataAccess;
 import fr.benvolat.models.Mission;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MissionService {
 
     private final MissionDataAccess missionDAO;
 
-    public MissionService() throws SQLException {
+    public MissionService() {
         this.missionDAO = new MissionDataAccess();
     }
 
