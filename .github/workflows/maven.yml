@@ -1,17 +1,52 @@
 name: JAVA CI
+
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install `openfortivpn`
+      - name: Install openfortivpn
+        run: sudo apt-get update && sudo apt-get install -y openfortivpn
+
+      # Step 3: Create VPN Configuration File
+      - name: Create VPN Configuration
+        run: |
+          echo "host = ${{ secrets.VPN_SERVER }}" | sudo tee /etc/openfortivpn/config
+          echo "port = 443" | sudo tee -a /etc/openfortivpn/config
+          echo "username = ${{ secrets.VPN_USERNAME }}" | sudo tee -a /etc/openfortivpn/config
+          echo "password = ${{ secrets.VPN_PASSWORD }}" | sudo tee -a /etc/openfortivpn/config
+          sudo chmod 600 /etc/openfortivpn/config
+
+      # Step 4: Connect to VPN
+      - name: Connect to VPN
+        run: sudo openfortivpn -c /etc/openfortivpn/config &
+
+      # Step 5: Wait for VPN Connection to Initialize
+      - name: Wait for VPN initialization
+        run: sleep 10
+
+      # Step 6: Verify VPN Connection (Optional, for Debugging)
+      - name: Verify VPN Connection
+        run: ip a
+
+      # Step 7: Install and Set Up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'adopt'
+          java-version: "17"
+          distribution: "adopt"
+
+      # Step 8: Compile code with Maven
       - name: Compile with Maven
         run: mvn --batch-mode compile
+
+      # Step 9: Run tests with Maven
       - name: Test with Maven
         run: mvn --batch-mode test
